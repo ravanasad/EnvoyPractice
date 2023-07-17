@@ -1,4 +1,7 @@
 ﻿namespace Shared.Entities
 {
-    public record BaseEntity(int Id);
+    public class BaseEntity
+    {
+        public int Id { get; set; }
+    }
 }

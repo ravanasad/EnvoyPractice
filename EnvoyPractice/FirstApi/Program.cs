@@ -7,7 +7,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddControllers();
-
 builder.Services.AddDbContext<ReservationDbContext>(opt =>
             opt.UseSqlServer(builder.Configuration.GetConnectionString("default")));
 
@@ -18,6 +17,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+await PrepDb.PrepPopulationAsync(app);
 
 if (app.Environment.IsDevelopment())
 {

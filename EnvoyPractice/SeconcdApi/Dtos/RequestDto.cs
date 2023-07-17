@@ -1,8 +1,6 @@
-﻿using Shared.Entities;
-
-namespace FirstApi.Data.Entities
+﻿namespace SeconcdApi.Dtos
 {
-    public class Reservation : BaseEntity
+    public class RequestDto
     {
         public string Fullname { get; set; }
         public string Email { get; set; }

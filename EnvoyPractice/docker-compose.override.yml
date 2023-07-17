@@ -1,0 +1,54 @@
+version: '3.4'
+
+services:
+### First API Reservation ###
+  firstapi:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - "ConnectionStrings__default=Server=reservationdb,1433;Database=ReservationDb;User=sa;Password=Esed2003@;TrustServerCertificate=True;"
+    ports:
+      - "5010:80"
+      - "5011:443"
+    depends_on:
+      - reservationdb
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    networks:
+      - test-net-1
+
+### ReservationDB ###
+  reservationdb:
+    restart: always
+    volumes:
+      - reservationdb:/var/lib/mssql
+    ports:
+      - 1433:1433
+    networks:
+      - test-net-1
+
+### Second API Email ###
+  seconcdapi:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+    ports:
+      - "5020:80"
+      - "5021:443"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    networks:
+      - test-net-1
+
+
+volumes:
+  reservationdb:
+  reservationapi:  
+networks:
+  test-net-1:
+    driver: bridge
+    external: true
+    
+      
