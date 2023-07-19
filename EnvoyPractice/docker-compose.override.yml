@@ -1,6 +1,14 @@
 version: '3.4'
 
 services:
+  envoygateway:
+    ports:
+      - 9902:9902
+      - 10001:10000
+    volumes:
+      - ./Envoy/envoy.yaml:/etc/envoy/envoy.yaml
+    networks:
+      - test-net-1
 ### First API Reservation ###
   firstapi:
     environment:
@@ -41,7 +49,17 @@ services:
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
     networks:
       - test-net-1
-
+### RabbiqMQ ###
+  rabbitmq:
+    container_name: rabbitmq
+    ports:
+        - 5672:5672
+        - 15672:15672
+    volumes:
+        - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+        - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    networks:
+        - test-net-1
 
 volumes:
   reservationdb:

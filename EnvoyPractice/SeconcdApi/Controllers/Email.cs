@@ -4,7 +4,7 @@ using SeconcdApi.Services.Interfaces;
 
 namespace SeconcdApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("email")]
     [ApiController]
     public class Email : ControllerBase
     {

@@ -1,5 +1,10 @@
 ﻿namespace FirstApi.Dtos
 {
-    public record CreateReservationDto(string Fullname, string Email, string Message);
-
+    public class CreateReservationDto
+    {
+        public string Fullname { get; set; }
+        public string Email { get; set; }
+        public string Message { get; set; }
+    }
+    
 }

@@ -3,20 +3,22 @@ using FirstApi.Data.Entities;
 using FirstApi.Dtos;
 using FirstApi.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Entities;
 
 namespace FirstApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("reservation")]
     [ApiController]
     public class ReservationController : ControllerBase
     {
         private readonly IReservationService _reservationService;
         private readonly IMapper _mapper;
-
-        public ReservationController(IReservationService reservationService, IMapper mapper)
+        private readonly IEventBus _eventBus;
+        public ReservationController(IReservationService reservationService, IMapper mapper, IEventBus eventBus)
         {
             _reservationService = reservationService;
             _mapper = mapper;
+            _eventBus = eventBus;
         }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetReservatoin(int id)
@@ -35,10 +37,18 @@ namespace FirstApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateReservation(CreateReservationDto request)
+        public async Task<IActionResult> CreateReservation(CreateReservationDto request, CancellationToken token)
         {
             var mappedRequest = _mapper.Map<Reservation>(request);
-            var response = _reservationService.AddAsync(mappedRequest);
+            var response = await _reservationService.AddAsync(mappedRequest);
+
+            await _eventBus.PublisAsync(new ReservationEvent()
+            {
+                Email = request.Email,
+                Fullname = request.Fullname,
+                Message = request.Message
+            }, token);
+
             var mappedRespone = _mapper.Map<ReservationDto>(response);
             return Ok(mappedRespone);
         }
@@ -47,7 +57,7 @@ namespace FirstApi.Controllers
         public async Task<IActionResult> UpdateReservation(UpdateReservationDto request)
         {
             var mappedRequest = _mapper.Map<Reservation>(request);
-            var response = _reservationService.UpdateAsync(mappedRequest);
+            var response = await _reservationService.UpdateAsync(mappedRequest);
             var mappedRespone = _mapper.Map<ReservationDto>(response);
             return Ok(mappedRespone);
         }
@@ -56,7 +66,7 @@ namespace FirstApi.Controllers
         public async Task<IActionResult> DeleteReservation(int id)
         {
             Reservation reservation = await _reservationService.GetByIdAsync(id);
-            var response = _reservationService.DeleteAsync(reservation);
+            var response = await _reservationService.DeleteAsync(reservation);
             var mappedRespone = _mapper.Map<ReservationDto>(response);
             return Ok(mappedRespone);
         }

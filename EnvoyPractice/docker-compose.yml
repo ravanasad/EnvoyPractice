@@ -1,12 +1,15 @@
 version: '3.4'
 
 services:
+  envoygateway:
+    build: 
+      context: .
+      dockerfile: ./Envoy/Dockerfile
   firstapi:
     image: ${DOCKER_REGISTRY-}firstapi
     build:
       context: .
       dockerfile: FirstApi/Dockerfile
-
   reservationdb:
     image: mcr.microsoft.com/mssql/server:2022-latest
     environment:
@@ -17,4 +20,9 @@ services:
     build:
       context: .
       dockerfile: SeconcdApi/Dockerfile
+  rabbitmq:
+    image: rabbitmq:3.12.2-management
+    environment:
+      - "RABBITMQ_DEFAULT_PASS=guest"
+      - "RABBITMQ_DEFAULT_USER=guest"
 
