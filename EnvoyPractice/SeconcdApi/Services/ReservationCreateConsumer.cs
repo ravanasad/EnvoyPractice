@@ -17,13 +17,13 @@ namespace SeconcdApi.Services
 
         public Task Consume(ConsumeContext<ReservationEvent> context)
         {
-            RequestDto dto = new RequestDto()
+            RequestDto request = new RequestDto()
             {
                 Email = context.Message.Email,
                 Fullname = context.Message.Fullname,
                 Message = context.Message.Message
             };
-            _emailService.SendEmail(new() { Email = context.Message.Email, });
+            _emailService.SendEmail(request);
             return Task.CompletedTask;
         }
     }

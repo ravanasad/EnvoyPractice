@@ -2,24 +2,34 @@ version: '3.4'
 
 services:
   envoygateway:
+    container_name: envoygateway
     ports:
       - 9902:9902
-      - 10001:10000
+      - 10000:10000
+      - 10001:10001
     volumes:
       - ./Envoy/envoy.yaml:/etc/envoy/envoy.yaml
+      - ./Envoy/https/https.crt:/etc/ssl/certs/https.crt
+      - ./Envoy/key.pem:/etc/ssl/certs/key.pem
+      - ./Envoy/cert.pem:/etc/ssl/certs/cert.pem
     networks:
       - test-net-1
+    depends_on:
+      - firstapi
+      - secondapi
 ### First API Reservation ###
   firstapi:
+    container_name: firstapi
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80
+      #- ASPNETCORE_URLS=https://+:443;http://+:80
       - "ConnectionStrings__default=Server=reservationdb,1433;Database=ReservationDb;User=sa;Password=Esed2003@;TrustServerCertificate=True;"
     ports:
       - "5010:80"
-      - "5011:443"
+      #- "5011:443"
     depends_on:
       - reservationdb
+      - rabbitmq
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
@@ -28,7 +38,11 @@ services:
 
 ### ReservationDB ###
   reservationdb:
+    container_name: reservationdb
     restart: always
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Esed2003@
     volumes:
       - reservationdb:/var/lib/mssql
     ports:
@@ -37,13 +51,16 @@ services:
       - test-net-1
 
 ### Second API Email ###
-  seconcdapi:
+  secondapi:
+    container_name: secondapi
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80
+      #- ASPNETCORE_URLS=https://+:443;http://+:80
     ports:
       - "5020:80"
-      - "5021:443"
+     # - "5021:443"
+    depends_on:
+      - rabbitmq
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
@@ -52,6 +69,9 @@ services:
 ### RabbiqMQ ###
   rabbitmq:
     container_name: rabbitmq
+    environment:
+      - "RABBITMQ_DEFAULT_PASS=guest"
+      - "RABBITMQ_DEFAULT_USER=guest"
     ports:
         - 5672:5672
         - 15672:15672
@@ -60,13 +80,31 @@ services:
         - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
     networks:
         - test-net-1
+  web:
+    container_name: web
+    environment:
+      #- ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_ENVIRONMENT=Development
+      - GatewayURL=http://envoygateway
+    ports:
+      - "5000:80"
+      #- "5001:443"
+    depends_on:
+      - envoygateway
+      - firstapi
+      - secondapi
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    networks:
+      - test-net-1
+
 
 volumes:
   reservationdb:
   reservationapi:  
+
 networks:
   test-net-1:
     driver: bridge
     external: true
-    
-      

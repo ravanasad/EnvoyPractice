@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
-
+builder.Services.AddHttpClient();
 builder.Services.AddMassTransit(opt =>
 {
     opt.AddConsumers(typeof(Program).Assembly);
@@ -36,8 +36,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseHttpsRedirection();
-
+//app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

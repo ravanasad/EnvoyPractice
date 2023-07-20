@@ -20,8 +20,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web", "Web\Web.csproj", "{D
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Envoy", "Envoy", "{829AA43C-4B5F-4BF9-8C64-595D99FF7E65}"
 	ProjectSection(SolutionItems) = preProject
+		Envoy\cert.pem = Envoy\cert.pem
 		Envoy\Dockerfile = Envoy\Dockerfile
 		Envoy\envoy.yaml = Envoy\envoy.yaml
+		Envoy\key.pem = Envoy\key.pem
 	EndProjectSection
 EndProject
 Global

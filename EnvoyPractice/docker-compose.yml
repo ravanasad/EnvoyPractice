@@ -12,17 +12,19 @@ services:
       dockerfile: FirstApi/Dockerfile
   reservationdb:
     image: mcr.microsoft.com/mssql/server:2022-latest
-    environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=Esed2003@
-  seconcdapi:
-    image: ${DOCKER_REGISTRY-}seconcdapi
+  secondapi:
+    image: ${DOCKER_REGISTRY-}secondapi
     build:
       context: .
       dockerfile: SeconcdApi/Dockerfile
   rabbitmq:
     image: rabbitmq:3.12.2-management
-    environment:
-      - "RABBITMQ_DEFAULT_PASS=guest"
-      - "RABBITMQ_DEFAULT_USER=guest"
+  web:
+    image: ${DOCKER_REGISTRY-}web
+    build:
+      context: .
+      dockerfile: Web/Dockerfile
+    
+      
+    
 
